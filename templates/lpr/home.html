@@ -1,0 +1,340 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block main %}
+<style>
+    h1 {
+        font-family: sans-serif;
+        font-size: 64px;
+        color: #CCC;
+        padding: 5px;
+        margin: 5px;
+    }
+
+    #img {
+        position: absolute;
+        z-index: 1;
+        border-radius: 20px;
+    }
+
+    #canvas_container {
+        display: inline-block;
+        width: 800px;
+        height: 400px;
+        margin: 10px auto;
+        background: black;
+        position: relative;
+        border: 0px solid black;
+        border-radius: 20px;
+        box-shadow: 0 5px 50px #333
+    }
+
+    #myCanvas {
+        position: relative;
+        z-index: 20;
+    }
+
+    ul {
+        padding: 0;
+        margin: 10px;
+        overflow-y: scroll;
+        height: 100px;
+    }
+
+    li:focus {
+        background: lightgreen;
+    }
+
+    li {
+        font-family: sans-serif;
+        background-color: gold;
+        float: left;
+        clear: both;
+        padding: 5px;
+        list-style-type: none;
+        margin: 10px;
+        border-radius: 5px;
+    }
+</style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" type="text/css" href="css/lpr/home.css" />
+
+url_cam<input id="url_cam" type="text" value="{{ LPRCamera.url }}" disabled
+    style="vertical-align: center; height: 10%; width:30%;" />
+<button id="edit_url_button" type="submit">Edit url</button>
+<button id="start_detection_button" type="button">Start Detection</button>
+<a href="{% url 'lpr:dashboard' %}">dashboard</a>
+<div id="main_container">
+
+    <div id="canvas_container">
+        <img id="img" width="800px" height="400px" src="{{ LPRCamera.url }}" />
+        <canvas id="myCanvas" width="800px" height="400px">
+            Your browser does not support the HTML5 canvas tag.
+        </canvas>
+
+        <button id="edit_roi_button" type="button">Edit Detection Zone</button>
+    </div>
+
+    <div id="config_container" style="display: inline-block;">
+
+        <ul id="allowed_plates">
+            
+        </ul>
+
+        new_allowed_plate<input id="new_allowed_plate" type="text" value="" 
+            style="vertical-align: center; height: 10%; width:30%;" />
+        <button id="add_new_plate_button" type="button">Add plate</button>
+        <button id="remove_plate_button" type="button">Remove selected plate</button>
+        
+    </div>
+
+</div>
+<!--<canvas id="myChart" width="500" height="200"></canvas>-->
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.12.0.min.js"></script>
+<script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>
+<script type="text/javascript">
+
+</script>
+<script>
+
+    DATA = {
+        id_cam: "none",
+        x: 0,
+        y: 0,
+        img: "none",
+        width: 0,
+        height: 0,
+        detection_zone: {{ LPRCamera.detection_zone }},
+        url: "asf"
+    }
+
+    // ALLOWED LIST PLATES SECTION
+    allowed_plates_str="{{ LPRCamera_allowed_plates }}"
+    allowed_plates_str=JSON.parse(allowed_plates_str.replace(/&#39;/g, "\""))
+    
+    var new_allowed_plate = document.getElementById("new_allowed_plate")
+    var allowed_plates_list = document.getElementById("allowed_plates")
+    var plate_selection = -1
+    
+    //FILL LIST
+    for(var i=0;i<allowed_plates_str.allowed_plates.length;i++)
+    {
+
+        var listItem = document.createElement("li")
+        listItem.textContent = allowed_plates_str.allowed_plates[i]
+        listItem.tabIndex="1"
+        allowed_plates_list.appendChild(listItem)
+        
+    }
+    //SELECT ALLOWED PLATE ON LIST
+    allowed_plates_list.onclick = function (event) {
+        var target = event.target
+        plate_selection = $(target).index()
+        
+
+    }
+    //BUTTONS
+    var remove_plate_button = document.getElementById("remove_plate_button")
+    var add_new_plate_button = document.getElementById("add_new_plate_button")
+    
+    //ADD NEW ALLOWED PLATE
+    add_new_plate_button.onclick = function () {
+        if(new_allowed_plate.value){
+            var listItem = document.createElement("li")
+            listItem.textContent = new_allowed_plate.value
+            listItem.tabIndex="1"
+
+            data_aux={
+                new_allowed_plate: new_allowed_plate.value 
+            }
+            console.log(data_aux)
+            $.getJSON("{% url 'lpr:add_new_allowed_plate' %}", data_aux).done(function (response) {
+                console.log("response", response)
+            }).fail(function (response, textStatus, error) {
+                console.log(response, textStatus, error)
+                console.log("err")
+            })
+
+            allowed_plates_list.appendChild(listItem)
+        }
+
+    }
+    //REMOVE ALLOWED PLATE
+    remove_plate_button.onclick = function () {
+        if(plate_selection!=-1){
+            console.log("plate to remove",allowed_plates_list.childNodes[plate_selection+1].textContent)
+
+            data_aux={
+                plate_to_remove: allowed_plates_list.childNodes[plate_selection+1].textContent
+            }
+            allowed_plates_list.removeChild(allowed_plates_list.childNodes[plate_selection+1])
+
+            $.getJSON("{% url 'lpr:remove_allowed_plate' %}", data_aux).done(function (response) {
+                console.log("response", response)
+            }).fail(function (response, textStatus, error) {
+                console.log(response, textStatus, error)
+                console.log("err")
+            })
+
+
+            plate_selection=-1
+        }        
+
+    }
+
+    //LOOP MAIN FUNCTION
+    lpr_timer = setInterval(fetchLPR, 15000)
+    function fetchLPR() {
+        if (toggle_detection)
+            $.getJSON("{% url 'lpr:fecthLPR' %}", DATA)
+                .done(function (response) {
+                    console.log("response", response)
+                })
+                .fail(function (response, textStatus, error) {
+                    console.log(response, textStatus, error)
+                })
+
+    }
+
+
+    //START DETECT BUTTON
+    var toggle_detection = false
+    var start_detection_button = document.getElementById("start_detection_button")
+    start_detection_button.onclick = function () {
+        if (toggle_detection) {
+            toggle_detection = false
+            start_detection_button.innerHTML = "Start Detection"
+        }
+        else {
+            start_detection_button.innerHTML = "Stop Detection"
+            toggle_detection = true
+        }
+    }
+
+    //CONFIG ROI DETECTION
+    var toggle_roi = false
+    var edit_roi_button = document.getElementById("edit_roi_button")
+    edit_roi_button.onclick = function () {
+
+        if (toggle_roi) {
+            toggle_roi = false
+            edit_roi_button.innerHTML = "Edit zone detection"
+            DATA.width = Math.abs(endX - initX)
+            DATA.height = Math.abs(endY - initY)
+
+            if (endX - initX < 0) {
+                initX = endX
+            }
+            if (endY - initY < 0) {
+                initY = endY
+            }
+            DATA.x = initX
+            DATA.y = initY
+
+            if (Math.abs(DATA.width) > 0 && Math.abs(DATA.height) > 0) {
+
+                $.getJSON("{% url 'lpr:edit_roi' %}", DATA)
+                    .done(function (response) {
+                        console.log("response", response)
+                    })
+                    .fail(function (response, textStatus, error) {
+                        console.log(response, textStatus, error)
+                    })
+            }
+        }
+        else {
+            edit_roi_button.innerHTML = "Save zone detection"
+            toggle_roi = true
+
+        }
+    }
+
+    var image = document.getElementById("img")
+
+    var toggle_url = false
+    var edit_url_button = document.getElementById("edit_url_button")
+    edit_url_button.onclick = function (e) {
+
+        e.preventDefault();
+        if (toggle_url) {
+            edit_url_button.innerHTML = "Edit url"
+            DATA.url = url_cam.value
+            image.src = url_cam.value
+            toggle_url = false
+            url_cam.disabled = true
+
+            console.log("DATA", "{% url 'lpr:save_url' %}")
+            $.getJSON("{% url 'lpr:save_url' %}", DATA).done(function (response) {
+                console.log("response", response)
+            }).fail(function (response, textStatus, error) {
+                console.log(response, textStatus, error)
+                console.log("err")
+            })
+        } else {
+            edit_url_button.innerHTML = "Save url"
+            toggle_url = true
+            url_cam.disabled = false
+        }
+    }
+    var url_cam = document.getElementById("url_cam")
+    url_cam.value = "{{ LPRCamera.url }}"
+
+    //CANVAS INIT
+    var canvas = document.getElementById("myCanvas")
+    var ctx = canvas.getContext("2d")
+    ctx.beginPath()
+
+    //USEFUL VARIABLES INIT
+    var initX = 0
+    var initY = 0
+    var endX = 0
+    var endY = 0
+    var isMouseDown = false
+
+    canvas.addEventListener('mousedown', function (e) {
+        initX = e.offsetX
+        initY = e.offsetY
+        isMouseDown = true
+        console.log(endX, endY)
+    })
+
+    canvas.addEventListener('mouseup', function (e) {
+        isMouseDown = false
+        console.log(endX, endY)
+    })
+
+    canvas.addEventListener('mousemove', function (e) {
+        if (isMouseDown && toggle_roi) {
+            console.log(endX, endY)
+            endX = e.offsetX
+            endY = e.offsetY
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            ctx.beginPath()
+
+            ctx.strokeStyle = 'red'
+            ctx.lineWidth = 5
+            ctx.rect(initX, initY, endX - initX, endY - initY)
+            ctx.stroke()
+        }
+    })
+
+    function draw_roi() {
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        ctx.beginPath()
+        ctx.strokeStyle = 'black'
+        ctx.lineWidth = 3
+        ctx.rect(
+            DATA.detection_zone[0],
+            DATA.detection_zone[1],
+            DATA.detection_zone[2],
+            DATA.detection_zone[3]
+        )
+        ctx.stroke()
+
+    }
+    draw_roi()
+
+</script>
+{% endblock %}
