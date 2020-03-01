@@ -198,9 +198,9 @@ def detect_plates(frame, net, meta, wpod_net, lp_threshold, letter_threshold):
         plate_pts = Llp[i].pts
         Ilp = Ilp*255
         Ilp = Ilp.astype(np.uint8)
-        cv2.imwrite('photo.jpg', Ilp)
+        cv2.imwrite('static/plate_to_ocr.jpg', Ilp)
         nnp_initialize()
-        r = detect(net, meta, b"photo.jpg", letter_threshold)
+        r = detect(net, meta, b"static/plate_to_ocr.jpg", letter_threshold)
         # print(r)
         posicion = []
         letra = []
@@ -267,8 +267,7 @@ def detect_plates(frame, net, meta, wpod_net, lp_threshold, letter_threshold):
                 temp_plates.append(matricula)
                 temp_counter_plates.append(0)
                 temp_timestamp.append(datetime.now()) 	
-                #cv2.imwrite(f"detected_plates/{matricula}.jpg",frame_to_save)
-                
+        cv2.imwrite(f"static/detection_photo.jpg",frame)
     return plates
 
 # for det in r[0]:

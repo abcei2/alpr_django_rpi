@@ -106,6 +106,7 @@ def fecthLPR(request):
                 LPRAux_reports=LPRCamera_reports(
                     detected_plate=i)
                 LPRAux_reports.save()   
+    cap.release()
     return JsonResponse({"ok": "ok"}, safe=False)
 
 def add_new_allowed_plate(request):
