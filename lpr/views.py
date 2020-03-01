@@ -82,31 +82,31 @@ def decode_base64(data, altchars=b'+/'):
     return base64.b64decode(data, altchars)
 
 def fecthLPR(request):
-    url_cam = request.GET.get('url')
-    img = request.GET.get('img')
-    req = urllib.request.urlopen(url_cam)
-    print(req)
-    arr = np.asarray(bytearray(req.read()), dtype=np.uint8)
-    frame = cv2.imdecode(arr, -1) # 'Load it as it is'
+    # url_cam = request.GET.get('url')
+    # img = request.GET.get('img')
+    # req = urllib.request.urlopen(url_cam)
+    # print(req)
+    # arr = np.asarray(bytearray(req.read()), dtype=np.uint8)
+    # frame = cv2.imdecode(arr, -1) # 'Load it as it is'
     
-    lp_threshold=0.7
-    letter_threshold=0.4
-    print(url_cam)
-    cap= cv2.VideoCapture(url_cam)
-    ret, frame=cap.read()
-    frame = cv2.resize(frame, (600,300), interpolation = cv2.INTER_CUBIC)
-    detected_plates=[]
-    with graph.as_default():
-        detected_plates=detect_plates(frame,net,meta, wpod_net,lp_threshold,letter_threshold)
-        print("detect_plates\n")
-        print(detected_plates)
-    #cap.release()
-        if detected_plates!=[]:
-            for i in detected_plates:
-                LPRAux_reports=LPRCamera_reports(
-                    detected_plate=i)
-                LPRAux_reports.save()   
-    cap.release()
+    # lp_threshold=0.7
+    # letter_threshold=0.4
+    # print(url_cam)
+    # cap= cv2.VideoCapture(url_cam)
+    # ret, frame=cap.read()
+    # frame = cv2.resize(frame, (600,300), interpolation = cv2.INTER_CUBIC)
+    # detected_plates=[]
+    # with graph.as_default():
+    #     detected_plates=detect_plates(frame,net,meta, wpod_net,lp_threshold,letter_threshold)
+    #     print("detect_plates\n")
+    #     print(detected_plates)
+    # #cap.release()
+    #     if detected_plates!=[]:
+    #         for i in detected_plates:
+    #             LPRAux_reports=LPRCamera_reports(
+    #                 detected_plate=i)
+    #             LPRAux_reports.save()   
+    # cap.release()
     return JsonResponse({"ok": "ok"}, safe=False)
 
 def add_new_allowed_plate(request):
@@ -137,6 +137,14 @@ def edit_roi(request):
     
     LPRCamera_obj = LPRCamera.objects.update(detection_zone=[x, y, width, height])
     return JsonResponse({"ok": "ok"}, safe=False)
+
+def config(request):
+
+    
+    context = {"categories": "categories", 'values': "values"}
+    print(context)
+    return render(request, 'configuration/config.html', context=context)
+
 
 def dashboard(request):
 

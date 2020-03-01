@@ -2,7 +2,7 @@ from django.urls import path
 from django.conf.urls import url
 
 from lpr.views import (
-   save_url, edit_roi, LPR_View, fecthLPR, dashboard, add_new_allowed_plate, remove_allowed_plate
+   config, save_url, edit_roi, LPR_View, fecthLPR, dashboard, add_new_allowed_plate, remove_allowed_plate
 )
 
 app_name = 'lpr'
@@ -16,6 +16,8 @@ urlpatterns = [
     path('fecthLPR', fecthLPR, {}, name='fecthLPR'),
     
     path('dashboard', dashboard, name='dashboard'),
+    path('config', config, name='config'),
+
 
 
     path('add_new_allowed_plate', add_new_allowed_plate, {}, name='add_new_allowed_plate'),

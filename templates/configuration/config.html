@@ -1,0 +1,55 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block main %}
+
+<div class="form-inline">
+    <label class="control-label" for="ip1">Ip_address</label>
+
+    <input type="tel" id="ip1" min="0" max="255" minlength="1" maxlength="3" size="4" style="width: 7ch">.
+    <input type="tel" id="ip2" min="0" max="255" minlength="1" maxlength="3" size="4" style="width: 7ch">.
+    <input type="tel" id="ip3" min="0" max="255" minlength="1" maxlength="3" size="4" style="width: 7ch">.
+    <input type="tel" id="ip4" min="0" max="255" minlength="1" maxlength="3" size="4" style="width: 7ch">
+
+</div>
+<div class="form-inline">
+    <label class="control-label" for="gateway1">Gateway   </label>
+
+    <input type="tel" id="gateway1" min="0" max="255" minlength="1" maxlength="3" size="4" style="width: 7ch">.
+    <input type="tel" id="gateway2" min="0" max="255" minlength="1" maxlength="3" size="4" style="width: 7ch">.
+    <input type="tel" id="gateway3" min="0" max="255" minlength="1" maxlength="3" size="4" style="width: 7ch">.
+    <input type="tel" id="gateway4" min="0" max="255" minlength="1" maxlength="3" size="4" style="width: 7ch">
+
+</div>
+<div class="form-inline">
+    <label class="control-label" for="mask1"> Mask</label>
+
+    <input type="tel" id="mask"  min="0" max="32" minlength="1" maxlength="2" size="2" style="width: 7ch">
+
+</div>
+<button id="change_config" class="btn btn-primary" type="button">Submit configuration</button>
+<script>
+    $('[type=tel]').on('change', function (e) {
+        console.log($(e.target).val())
+        //$(e.target).val($(e.target).val().replace(/[0-9]/g, ''))
+    })  
+    $('[type=tel]').on('keypress', function (e) {
+        var before_val=$(e.target).val()
+        if(before_val){
+            if(before_val>25)
+                keys = []
+            else if(before_val==25)
+                keys = ['0','1', '2', '3', '4', '5']
+            else
+                keys = ['0','1', '2', '3', '4', '5','6','7','8','9']
+        }else{
+            keys = ['1', '2', '3', '4', '5','6','7','8','9']
+
+        }
+        return keys.indexOf(event.key) > -1
+    })
+    
+</script>
+
+
+
+{% endblock %}

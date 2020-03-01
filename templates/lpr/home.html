@@ -160,7 +160,8 @@
 
     // ALLOWED LIST PLATES SECTION
     allowed_plates_str="{{ LPRCamera_allowed_plates }}"
-    allowed_plates_str=JSON.parse(allowed_plates_str.replace(/&#x27;/g, "\""))
+    allowed_plates_str=JSON.parse(allowed_plates_str.replace(/&#37;/g, "\""))
+    //allowed_plates_str=JSON.parse(allowed_plates_str.replace(/&#x27;/g, "\""))
     
     var new_allowed_plate = document.getElementById("new_allowed_plate")
     var allowed_plates_list = document.getElementById("allowed_plates")

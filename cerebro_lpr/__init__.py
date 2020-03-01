@@ -54,8 +54,8 @@ class METADATA(Structure):
 
 
 #lib = CDLL("/home/pjreddie/documents/darknet/libdarknet.so", RTLD_GLOBAL)
-lib = CDLL(
-    "/home/pi/DARKNET_RPI/darknet_that_works/libdarknet.so", RTLD_GLOBAL)
+#lib = CDLL("/home/pi/DARKNET_RPI/darknet_that_works/libdarknet.so", RTLD_GLOBAL)
+lib = CDLL("/home/santi/ECUADOR/alpr-unconstrained/darknet/libdarknet.so", RTLD_GLOBAL)
 lib.network_width.argtypes = [c_void_p]
 lib.network_width.restype = c_int
 lib.network_height.argtypes = [c_void_p]
@@ -125,9 +125,9 @@ predict_image = lib.network_predict_image
 predict_image.argtypes = [c_void_p, IMAGE]
 predict_image.restype = POINTER(c_float)
 
-srand = lib.srand
-srand.argtypes = [c_int]
-nnp_initialize = lib.nnp_initialize
+# srand = lib.srand
+# srand.argtypes = [c_int]
+# nnp_initialize = lib.nnp_initialize
 
 
 def classify(net, meta, im):
