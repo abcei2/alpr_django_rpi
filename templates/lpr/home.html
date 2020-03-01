@@ -63,7 +63,7 @@
 </style>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<link rel="stylesheet" type="text/css" href="css/lpr/home.css" />
+
 
 <br>
 <div class="container">
@@ -94,7 +94,7 @@
     <br>
     <br>
     <div class="row">
-        <img id="detection_image" width="800px" height="400px"   src="{% static 'detection_photo.jpg' %}"  />
+        <img id="detection_image" width="800px" height="400px"   src="{% static 'plate_proccesed.jpg' %}"  />
         <img id="video_image" width="800px" height="400px" src="{{ LPRCamera.url }}"  />
         <canvas id="myCanvas" width="800px" height="400px">
             Your browser does not support the HTML5 canvas tag.
@@ -155,12 +155,12 @@
         width: 0,
         height: 0,
         detection_zone: {{ LPRCamera.detection_zone }},
-        url: "asf"
+        url: "{{ LPRCamera.url }}"
     }
 
     // ALLOWED LIST PLATES SECTION
     allowed_plates_str="{{ LPRCamera_allowed_plates }}"
-    allowed_plates_str=JSON.parse(allowed_plates_str.replace(/&#39;/g, "\""))
+    allowed_plates_str=JSON.parse(allowed_plates_str.replace(/&#x27;/g, "\""))
     
     var new_allowed_plate = document.getElementById("new_allowed_plate")
     var allowed_plates_list = document.getElementById("allowed_plates")
@@ -234,7 +234,7 @@
     }
 
     //LOOP MAIN FUNCTION
-    lpr_timer = setInterval(fetchLPR, 15000)
+    lpr_timer = setInterval(fetchLPR, 20000)
     function fetchLPR() {
         if (toggle_detection)
             $.getJSON("{% url 'lpr:fecthLPR' %}", DATA)
@@ -375,7 +375,7 @@
         if (isMouseDown && toggle_roi) {
             console.log(endX, endY)
             endX = e.offsetX
-            endY = e.offsetY
+           endY = e.offsetY
 
             ctx.clearRect(0, 0, canvas.width, canvas.height)
             ctx.beginPath()

@@ -184,9 +184,10 @@ def detect_plates(frame, net, meta, wpod_net, lp_threshold, letter_threshold):
 
     ratio = float(max(frame.shape[:2]))/min(frame.shape[:2])
     
-    
-    side = int(ratio*288.-60)
-    bound_dim = min(side + (side % (2**4)), 608.-60)
+ #   if ratio > 2.5:
+#        ratio=2
+    side = int(ratio*288.-20)
+    bound_dim = min(side + (side % (2**4)), 608.-20)
 
     print("\t\tBound dim: %d, ratio: %f" % (bound_dim, ratio))
     Llp, LlpImgs, _ = detect_lp(wpod_net, im2single(

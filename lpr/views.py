@@ -89,12 +89,12 @@ def fecthLPR(request):
     arr = np.asarray(bytearray(req.read()), dtype=np.uint8)
     frame = cv2.imdecode(arr, -1) # 'Load it as it is'
     
-    lp_threshold=0.3
+    lp_threshold=0.7
     letter_threshold=0.4
     print(url_cam)
     cap= cv2.VideoCapture(url_cam)
     ret, frame=cap.read()
-    frame = cv2.resize(frame, (800,400), interpolation = cv2.INTER_CUBIC)
+    frame = cv2.resize(frame, (600,300), interpolation = cv2.INTER_CUBIC)
     detected_plates=[]
     with graph.as_default():
         detected_plates=detect_plates(frame,net,meta, wpod_net,lp_threshold,letter_threshold)
