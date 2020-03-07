@@ -9,7 +9,9 @@ class LPRCamera(models.Model):
     url = models.URLField(unique=True)
     # Always use the format 'lon.gitude,lat.itude'
     geopoint = models.CharField(max_length=100)
-    
+    eth_ip= models.CharField(max_length=16,default="192.168.1.10")
+    eth_gateway= models.CharField(max_length=16,default="192.168.1.1")
+    eth_mask= models.PositiveIntegerField(default=24)
 
 class LPRCamera_allowed_plates(models.Model):
 

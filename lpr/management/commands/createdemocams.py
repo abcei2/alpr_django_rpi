@@ -5,8 +5,10 @@ from lpr.models import LPRCamera_allowed_plates
 
 lpr_camera_data = {  # River parking
         'geopoint': '-75.378712,6.148837',  # 6ta etapa
-        'url': "http://75.147.0.206/mjpg/video.mjpg"
-
+        'url': "http://75.147.0.206/mjpg/video.mjpg",
+        'eth_ip': "192.168.1.10",
+        'eth_gateway': "192.168.1.1",
+        'eth_mask':24
     }
 
 

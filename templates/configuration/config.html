@@ -21,13 +21,64 @@
 
 </div>
 <div class="form-inline">
-    <label class="control-label" for="mask1"> Mask</label>
+    <label class="control-label" for="mask"> Mask</label>
 
     <input type="tel" id="mask"  min="0" max="32" minlength="1" maxlength="2" size="2" style="width: 7ch">
 
 </div>
-<button id="change_config" class="btn btn-primary" type="button">Submit configuration</button>
+<button id="change_config_button" class="btn btn-primary" type="button">Submit configuration</button>
 <script>
+    DATA = {
+        eth_ip: "{{ eth_ip | safe }}",
+        eth_gateway: "{{ eth_gateway | safe }}",
+        eth_mask: "{{ eth_mask | safe }}"
+    }
+    var ip1 = document.getElementById("ip1"); 
+    var ip2 = document.getElementById("ip2"); 
+    var ip3 = document.getElementById("ip3"); 
+    var ip4 = document.getElementById("ip4"); 
+
+    var splitted_eth_ip=DATA.eth_ip.split(".")
+
+    ip1.value=splitted_eth_ip[0]
+    ip2.value=splitted_eth_ip[1]
+    ip3.value=splitted_eth_ip[2]
+    ip4.value=splitted_eth_ip[3]
+
+    var gateway1 = document.getElementById("gateway1"); 
+    var gateway2 = document.getElementById("gateway2"); 
+    var gateway3 = document.getElementById("gateway3"); 
+    var gateway4 = document.getElementById("gateway4"); 
+    
+
+    var splitted_eth_gateway=DATA.eth_gateway.split(".")
+    
+    gateway1.value=splitted_eth_gateway[0]
+    gateway2.value=splitted_eth_gateway[1]
+    gateway3.value=splitted_eth_gateway[2]
+    gateway4.value=splitted_eth_gateway[3]
+
+    var mask = document.getElementById("mask"); 
+    mask.value=DATA.eth_mask
+
+    var change_config_button=document.getElementById("change_config_button"); 
+
+    change_config_button.onclick = function () {
+        console.log(ip1.value+"."+ip2.value+"."+ip3.value+"."+ip4.value)
+        DATA.eth_ip=ip1.value+"."+ip2.value+"."+ip3.value+"."+ip4.value
+        DATA.eth_gateway=gateway1.value+"."+gateway2.value+"."+gateway3.value+"."+gateway4.value
+        DATA.eth_mask=mask.value
+        $.getJSON("{% url 'lpr:update_ip' %}", DATA).done(function (response) {
+            console.log("response", response)
+        }).fail(function (response, textStatus, error) {
+            console.log(response, textStatus, error)
+            console.log("err")
+        })
+        console.log(DATA)
+    }
+
+    console.log(splitted_eth_gateway)
+
     $('[type=tel]').on('change', function (e) {
         console.log($(e.target).val())
         //$(e.target).val($(e.target).val().replace(/[0-9]/g, ''))

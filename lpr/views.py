@@ -22,12 +22,13 @@ import numpy as np
 from datetime import datetime, timedelta
 from cerebro_lpr import load_plate_models, detect_plates
 import cv2
+import subprocess
 # Create your views here.
 
 
-net, meta, wpod_net=load_plate_models()
+#net, meta, wpod_net=load_plate_models()
 
-graph = tf.get_default_graph()
+#graph = tf.get_default_graph()
 class BaseView(View):
     def global_context(self, request=None):
         return {
@@ -138,11 +139,22 @@ def edit_roi(request):
     LPRCamera_obj = LPRCamera.objects.update(detection_zone=[x, y, width, height])
     return JsonResponse({"ok": "ok"}, safe=False)
 
+def update_ip(request):
+    eth_ip = request.GET.get('eth_ip')
+    eth_gateway = request.GET.get('eth_gateway')
+    eth_mask = request.GET.get('eth_mask')
+    LPRCamera_obj = LPRCamera.objects.update(eth_ip=eth_ip,eth_gateway=eth_gateway,eth_mask=eth_mask)
+    subprocess.call([f'bash static/scripts/CHANGE_IP.sh {eth_ip} {eth_gateway} {eth_mask}'])
+    return JsonResponse({"ok": "ok"}, safe=False)
+
+
 def config(request):
 
-    
-    context = {"categories": "categories", 'values': "values"}
-    print(context)
+    eth_ip = list(LPRCamera.objects.values('eth_ip'))[0]['eth_ip']
+    eth_gateway = list(LPRCamera.objects.values('eth_gateway'))[0]['eth_gateway']
+    eth_mask = list(LPRCamera.objects.values('eth_mask'))[0]['eth_mask']
+
+    context = {"eth_ip": eth_ip, "eth_gateway": eth_gateway,"eth_mask":eth_mask}
     return render(request, 'configuration/config.html', context=context)
 
 
