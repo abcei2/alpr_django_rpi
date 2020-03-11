@@ -144,7 +144,10 @@ def update_ip(request):
     eth_gateway = request.GET.get('eth_gateway')
     eth_mask = request.GET.get('eth_mask')
     LPRCamera_obj = LPRCamera.objects.update(eth_ip=eth_ip,eth_gateway=eth_gateway,eth_mask=eth_mask)
-    subprocess.call([f'bash static/scripts/CHANGE_IP.sh {eth_ip} {eth_gateway} {eth_mask}'])
+
+    subprocess.check_call(['static/scripts/CHANGE_IP.sh', eth_ip, eth_gateway, eth_mask])
+    subprocess.check_call(['sudo reboot'])
+    
     return JsonResponse({"ok": "ok"}, safe=False)
 
 

@@ -1,8 +1,9 @@
+#!/bin/bash
 ip_address=$1
 gateway=$2
 mask=$3
 
-file="/etc/dhcpcd.conf"
+file="/home/santi/ECUADOR/LPR/rpi/alpr_django_rpi/dhcpcd.conf"
 #
 #
 rm var
