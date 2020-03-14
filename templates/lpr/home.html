@@ -125,7 +125,7 @@
 
         <div class="col-sm-4">
 
-            new_allowed_plate<input id="new_allowed_plate" type="text" value="" class="form-control" />
+            new_allowed_plate<input id="new_allowed_plate" type="plate" value="" class="form-control" />
             <button id="add_new_plate_button" class="btn btn-primary" type="button">Add plate</button>
             <button id="remove_plate_button" class="btn btn-primary" type="button">Remove selected plate</button>
         
@@ -160,8 +160,33 @@
 
     // ALLOWED LIST PLATES SECTION
     allowed_plates_str="{{ LPRCamera_allowed_plates }}"
-    allowed_plates_str=JSON.parse(allowed_plates_str.replace(/&#37;/g, "\""))
+    allowed_plates_str=JSON.parse(allowed_plates_str.replace(/&#39;/g, "\""))
+    //allowed_plates_str=JSON.parse(allowed_plates_str.replace(/&#37;/g, "\""))
     //allowed_plates_str=JSON.parse(allowed_plates_str.replace(/&#x27;/g, "\""))
+    
+    $('[type=plate]').on('change', function (e) {
+        console.log($(e.target).val())
+        //$(e.target).val($(e.target).val().replace(/[0-9]/g, ''))
+    })  
+    $('[type=plate]').on('keypress', function (e) {
+        var before_val=$(e.target).val()
+        console.log(before_val.length)
+        if(before_val){
+            if(before_val.length>=6)
+                keys=[]
+            else if(before_val.length<3)
+                keys = ['A', 'B', 'C', 'D', 'E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','X','Y','Z']
+          
+                // keys = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','x','y','z',
+                //     'A', 'B', 'C', 'D', 'E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','X','Y','Z']
+            else
+                keys = ['0','1', '2', '3', '4', '5','6','7','8','9']
+        }else{
+            keys = ['A', 'B', 'C', 'D', 'E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','X','Y','Z']
+          
+        }
+        return keys.indexOf(event.key) > -1
+    })
     
     var new_allowed_plate = document.getElementById("new_allowed_plate")
     var allowed_plates_list = document.getElementById("allowed_plates")
@@ -186,17 +211,19 @@
     }
 
     //ADD/REMOVE ALLOWED PLATE BUTTONS
+    
+
     var remove_plate_button = document.getElementById("remove_plate_button")
     var add_new_plate_button = document.getElementById("add_new_plate_button")
     
     //ADD NEW ALLOWED PLATE
     add_new_plate_button.onclick = function () {
-        if(new_allowed_plate.value){
+        if(new_allowed_plate.value && new_allowed_plate.value.length==6){
             var listItem = document.createElement("li")
             listItem.textContent = new_allowed_plate.value
             listItem.tabIndex="1"
 
-            data_aux={
+            data_aux={  
                 new_allowed_plate: new_allowed_plate.value 
             }
             console.log(data_aux)
@@ -208,6 +235,8 @@
             })
 
             allowed_plates_list.appendChild(listItem)
+        }else{
+            alert("PLATE MUST BE ON \nCOLOMBIAN PLATE FORMAT\nLIKE ABC123.")
         }
 
     }
